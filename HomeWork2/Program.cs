@@ -110,7 +110,9 @@ namespace HomeWork2
         static string RandomCharGenerator(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
             var stringChars = new char[length];
+
             var random = new Random();
 
             for (int i = 0; i < stringChars.Length; i++)
@@ -139,6 +141,7 @@ namespace HomeWork2
         static string Compress(string dna)
         {
             StringBuilder compressed = new StringBuilder();
+
             int count = 1;
 
             for (int i = 1; i < dna.Length; i++)
@@ -150,12 +153,15 @@ namespace HomeWork2
                 else
                 {
                     compressed.Append(dna[i - 1]);
+
                     if (count > 1) compressed.Append(count);
+
                     count = 1;
                 }
             }
 
             compressed.Append(dna[dna.Length - 1]);
+
             if (count > 1) compressed.Append(count);
 
             return compressed.ToString();
@@ -168,6 +174,7 @@ namespace HomeWork2
             for (int i = 0; i < compressedDna.Length; i++)
             {
                 char nucleotide = compressedDna[i];
+
                 if (Char.IsLetter(nucleotide))
                 {
                     decompressed.Append(nucleotide);
@@ -175,7 +182,9 @@ namespace HomeWork2
                 else
                 {
                     int repeatCount = int.Parse(compressedDna[i].ToString());
+
                     char lastNucleotide = decompressed[decompressed.Length - 1];
+
                     decompressed.Append(lastNucleotide, repeatCount - 1);
                 }
             }
@@ -190,6 +199,7 @@ namespace HomeWork2
             for (int i = 0; i < text.Length; i++)
             {
                 char character = (char)(text[i] ^ key[i % key.Length]);
+
                 encrypted.Append(character);
             }
 
