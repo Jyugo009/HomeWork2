@@ -6,7 +6,8 @@ namespace HomeWork2
 {
     public class Program
     {
-        private static readonly string key = "mySecretKey";
+        private static readonly string key = "onigirigiri";
+
         static void Main(string[] args)
         {
             //Task 1
@@ -17,7 +18,7 @@ namespace HomeWork2
 
             //Task 2
 
-            string input = "This assistant is so fucking!!!! good, i like it! A Two tea from me!";
+            string input = "This assistant is so FuCKing!!!! good, i like it! A Two tea from me!";
 
             string[] exceptWords = { "cunt", "suck", "ass", "idiot", "fuck", "fucking", "reee" };
 
@@ -43,15 +44,14 @@ namespace HomeWork2
 
             //Task 5
 
-            string dna = "AAACCGTTTGGGA";
+            string originalDna = "ACGT";
+            Console.WriteLine($"Original DNA: {originalDna}");
 
-            string compressedDna = Compress(dna);
-
-            string decompressedDna = Decompress(compressedDna);
-
-            Console.WriteLine($"Original DNA: {dna}");
+            string compressedDna = Compress(originalDna);
 
             Console.WriteLine($"Compressed DNA: {compressedDna}");
+
+            string decompressedDna = Decompress(compressedDna);
 
             Console.WriteLine($"Decompressed DNA: {decompressedDna}");
 
@@ -121,77 +121,91 @@ namespace HomeWork2
             return total;
         }
 
-        static string Compress(string dna)
+        public static string Compress(string dna)
         {
-            StringBuilder compressed = new StringBuilder();
+            StringBuilder compressedDNA = new StringBuilder();
 
-            int count = 1;
-
-            for (int i = 1; i < dna.Length; i++)
+            foreach (char nucleotide in dna)
             {
-                if (dna[i] == dna[i - 1])
+                switch (nucleotide)
                 {
-                    count++;
-                }
-                else
-                {
-                    compressed.Append(dna[i - 1]);
-
-                    if (count > 1) compressed.Append(count);
-
-                    count = 1;
+                    case 'A':
+                        compressedDNA.Append("00");
+                        break;
+                    case 'C':
+                        compressedDNA.Append("01");
+                        break;
+                    case 'G':
+                        compressedDNA.Append("10");
+                        break;
+                    case 'T':
+                        compressedDNA.Append("11");
+                        break;
+                    default:
+                        throw new ArgumentException("Invalid nucleotide.");
                 }
             }
 
-            compressed.Append(dna[dna.Length - 1]);
-
-            if (count > 1) compressed.Append(count);
-
-            return compressed.ToString();
+            return compressedDNA.ToString();
         }
 
-        static string Decompress(string compressedDna)
+        public static string Decompress(string compressedDna)
         {
-            StringBuilder decompressed = new StringBuilder();
+            if (compressedDna.Length % 2 != 0)
+                throw new ArgumentException("Invalid compressed DNA length.");
 
-            for (int i = 0; i < compressedDna.Length; i++)
+            StringBuilder decompressedDNA = new StringBuilder();
+
+            for (int i = 0; i < compressedDna.Length; i += 2)
             {
-                char nucleotide = compressedDna[i];
+                string code = compressedDna.Substring(i, 2);
 
-                if (Char.IsLetter(nucleotide))
+                switch (code)
                 {
-                    decompressed.Append(nucleotide);
-                }
-                else
-                {
-                    int repeatCount = int.Parse(compressedDna[i].ToString());
-
-                    char lastNucleotide = decompressed[decompressed.Length - 1];
-
-                    decompressed.Append(lastNucleotide, repeatCount - 1);
+                    case "00":
+                        decompressedDNA.Append('A');
+                        break;
+                    case "01":
+                        decompressedDNA.Append('C');
+                        break;
+                    case "10":
+                        decompressedDNA.Append('G');
+                        break;
+                    case "11":
+                        decompressedDNA.Append('T');
+                        break;
+                    default:
+                        throw new ArgumentException("Invalid DNA code.");
                 }
             }
 
-            return decompressed.ToString();
+            return decompressedDNA.ToString();
         }
 
         static string Encrypt(string text)
         {
-            StringBuilder encrypted = new StringBuilder();
+            byte[] textBytes = Encoding.UTF8.GetBytes(text);
+            byte[] encryptedBytes = new byte[textBytes.Length];
 
-            for (int i = 0; i < text.Length; i++)
+            for (int i = 0; i < textBytes.Length; i++)
             {
-                char character = (char)(text[i] ^ key[i % key.Length]);
-
-                encrypted.Append(character);
+                encryptedBytes[i] = (byte)(textBytes[i] ^ key[i % key.Length]);
             }
 
-            return encrypted.ToString();
+            return Convert.ToBase64String(encryptedBytes);
         }
 
-        static string Decrypt(string text)
+        static string Decrypt(string encryptedText)
         {
-            return Encrypt(text);
+            byte[] encryptedBytes = Convert.FromBase64String(encryptedText);
+            byte[] decryptedBytes = new byte[encryptedBytes.Length];
+
+            for (int i = 0; i < encryptedBytes.Length; i++)
+            {
+                decryptedBytes[i] = (byte)(encryptedBytes[i] ^ key[i % key.Length]);
+            }
+
+            return Encoding.UTF8.GetString(decryptedBytes);
         }
 
         public static string Filter(string textExample, string[] exceptWords)
