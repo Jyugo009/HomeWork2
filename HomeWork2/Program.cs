@@ -1,9 +1,10 @@
-﻿using System.Text;
+﻿using Microsoft.VisualBasic;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace HomeWork2
 {
-    internal class Program
+    public class Program
     {
         private static readonly string key = "mySecretKey";
         static void Main(string[] args)
@@ -18,29 +19,11 @@ namespace HomeWork2
 
             string input = "This assistant is so fucking!!!! good, i like it! A Two tea from me!";
 
-            var badWords = new HashSet<string> { "cunt", "suck", "ass", "idiot", "fuck", "fucking", "reee"  };
+            string[] exceptWords = { "cunt", "suck", "ass", "idiot", "fuck", "fucking", "reee" };
 
-            var matches = Regex.Matches(input, @"\w+|\W+");
+            string filteredString = Filter(input, exceptWords);
 
-            string[] censoredWords = new string[matches.Count];
-
-            for (int i = 0; i < matches.Count; i++)
-            {
-                var word = matches[i].Value;
-               
-                if (Regex.IsMatch(word, @"^\w+$") && badWords.Contains(word))
-                {
-                    censoredWords[i] = new string('*', word.Length);
-                }
-                else
-                {
-                    censoredWords[i] = word;
-                }
-            }
-
-            string result = String.Join("", censoredWords);
-
-            Console.WriteLine(result);
+            Console.WriteLine(filteredString);
 
             //Task 3
 
@@ -120,7 +103,7 @@ namespace HomeWork2
                 stringChars[i] = chars[random.Next(chars.Length)];
             }
 
-           
+
             return new string(stringChars);
         }
 
@@ -210,5 +193,26 @@ namespace HomeWork2
         {
             return Encrypt(text);
         }
+
+        public static string Filter(string textExample, string[] exceptWords)
+        {
+            HashSet<string> exceptWordsHash = new HashSet<string>(exceptWords, StringComparer.OrdinalIgnoreCase);
+
+            string[] splitResult = Regex.Split(textExample, @"(\s|,|\.|!|\?)");
+
+            for (int i = 0; i < splitResult.Length; i++)
+            {
+                if (exceptWordsHash.Contains(splitResult[i]))
+                {
+                    splitResult[i] = "***";
+                }
+            }
+
+            return string.Join("", splitResult);
+        }
+
+        
+
+
     }
 }
