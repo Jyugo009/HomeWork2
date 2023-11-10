@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -44,16 +45,24 @@ namespace HomeWork2
 
             //Task 5
 
-            string originalDna = "ACGT";
-            Console.WriteLine($"Original DNA: {originalDna}");
+            string dna = "ACGT";
 
-            string compressedDna = Compress(originalDna);
+            byte[] compressedDna = Compress(dna);
 
-            Console.WriteLine($"Compressed DNA: {compressedDna}");
+            Console.WriteLine("Compressed DNA:");
+
+            foreach (byte b in compressedDna)
+            {
+                Console.Write($"{b} ");
+            }
+
+            Console.WriteLine();
 
             string decompressedDna = Decompress(compressedDna);
 
-            Console.WriteLine($"Decompressed DNA: {decompressedDna}");
+            Console.WriteLine("Decompressed DNA:");
+
+            Console.WriteLine(decompressedDna);
 
             //Task 6
 
@@ -121,65 +130,61 @@ namespace HomeWork2
             return total;
         }
 
-        public static string Compress(string dna)
-        {
-            StringBuilder compressedDNA = new StringBuilder();
 
-            foreach (char nucleotide in dna)
+        public static byte[] Compress(string dna)
+        {
+            byte[] bytes = new byte[dna.Length];
+
+            for (int i = 0; i < dna.Length; i++)
             {
-                switch (nucleotide)
+                switch (dna[i])
                 {
                     case 'A':
-                        compressedDNA.Append("00");
+                        bytes[i] = 0;
                         break;
                     case 'C':
-                        compressedDNA.Append("01");
+                        bytes[i] = 1;
                         break;
                     case 'G':
-                        compressedDNA.Append("10");
+                        bytes[i] = 2;
                         break;
                     case 'T':
-                        compressedDNA.Append("11");
+                        bytes[i] = 3;
                         break;
                     default:
                         throw new ArgumentException("Invalid nucleotide.");
                 }
             }
 
-            return compressedDNA.ToString();
+            return bytes;
         }
 
-        public static string Decompress(string compressedDna)
+        public static string Decompress(byte[] compressedDna)
         {
-            if (compressedDna.Length % 2 != 0)
-                throw new ArgumentException("Invalid compressed DNA length.");
+            char[] dnaChars = new char[compressedDna.Length];
 
-            StringBuilder decompressedDNA = new StringBuilder();
-
-            for (int i = 0; i < compressedDna.Length; i += 2)
+            for (int i = 0; i < compressedDna.Length; i++)
             {
-                string code = compressedDna.Substring(i, 2);
-
-                switch (code)
+                switch (compressedDna[i])
                 {
-                    case "00":
-                        decompressedDNA.Append('A');
+                    case 0:
+                        dnaChars[i] = 'A';
                         break;
-                    case "01":
-                        decompressedDNA.Append('C');
+                    case 1:
+                        dnaChars[i] = 'C';
                         break;
-                    case "10":
-                        decompressedDNA.Append('G');
+                    case 2:
+                        dnaChars[i] = 'G';
                         break;
-                    case "11":
-                        decompressedDNA.Append('T');
+                    case 3:
+                        dnaChars[i] = 'T';
                         break;
                     default:
-                        throw new ArgumentException("Invalid DNA code.");
+                        throw new ArgumentException("Invalid compressed nucleotide value.");
                 }
             }
 
-            return decompressedDNA.ToString();
+            return new string(dnaChars);
         }
 
         static string Encrypt(string text)
